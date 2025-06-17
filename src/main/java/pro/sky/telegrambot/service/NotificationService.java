@@ -32,7 +32,7 @@ public class NotificationService {
                 LocalDateTime now = LocalDateTime.now();
 
                 if (dateTime.isBefore(now)) {
-                    throw new IllegalArgumentException("❌ Нельзя создать напоминание в прошлом. Укажи время позже текущего.");
+                    return "❌ Нельзя создать напоминание в прошлом. Укажи время позже текущего.";
                 }
 
                 NotificationTask task = new NotificationTask(chatId, text, dateTime);
