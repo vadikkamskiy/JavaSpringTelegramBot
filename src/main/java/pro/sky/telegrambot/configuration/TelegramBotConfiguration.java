@@ -14,9 +14,14 @@ public class TelegramBotConfiguration {
 
     @Bean
     public TelegramBot telegramBot() {
+        if (token == null || token.isBlank()) {
+            throw new IllegalStateException("BOT_TOKEN is not set in .env file");
+        }
+
         TelegramBot bot = new TelegramBot(token);
+
         bot.execute(new DeleteMyCommands());
+
         return bot;
     }
-
 }
