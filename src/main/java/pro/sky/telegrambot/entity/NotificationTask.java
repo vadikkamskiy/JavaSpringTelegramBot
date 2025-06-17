@@ -30,7 +30,7 @@ public class NotificationTask {
         this.chatId = chatId;
         this.messageText = messageText;
         this.notificationDatetime = notificationDatetime;
-        this.createdAt = LocalDateTime.now(); // По умолчанию
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
