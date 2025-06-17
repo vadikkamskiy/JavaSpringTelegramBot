@@ -18,29 +18,33 @@ public class NotificationService {
         this.repository = repository;
     }
 
-    public void handleIncomingMessage(Long chatId, String messageText) {
+    public String handleIncomingMessage(Long chatId, String messageText) {
         Pattern pattern = Pattern.compile("^(\\d{2}\\.\\d{2}\\.\\d{4} \\d{2}:\\d{2})\\s+(.+)$");
         Matcher matcher = pattern.matcher(messageText);
 
         if (matcher.matches()) {
-            String datetimeString = matcher.group(1);
-            String text = matcher.group(2);
+            try{
+                String datetimeString = matcher.group(1);
+                String text = matcher.group(2);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-            LocalDateTime dateTime = LocalDateTime.parse(datetimeString, formatter);
-            LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+                LocalDateTime dateTime = LocalDateTime.parse(datetimeString, formatter);
+                LocalDateTime now = LocalDateTime.now();
 
-            if (dateTime.isBefore(now)) {
-                throw new IllegalArgumentException("❌ Нельзя создать напоминание в прошлом. Укажи время позже текущего.");
+                if (dateTime.isBefore(now)) {
+                    throw new IllegalArgumentException("❌ Нельзя создать напоминание в прошлом. Укажи время позже текущего.");
+                }
+
+                NotificationTask task = new NotificationTask(chatId, text, dateTime);
+                repository.save(task);
+
+                return "✅ Напоминание добавлено: " + text + " в " + dateTime;
+
+            } catch (Exception e) {
+                return "❌ Ошибка при добавлении напоминания: " + e.getMessage();
             }
-
-            NotificationTask task = new NotificationTask(chatId, text, dateTime);
-            repository.save(task);
-
-            System.out.println("✅ Напоминание добавлено: " + text + " в " + dateTime);
-
-        } else {
-            throw new IllegalArgumentException("❌ Неверный формат. Пример: 12.12.2025 20:00 Сделать домашку");
+        }else{
+            return "❓ Не понимаю. Пожалуйста, используй формат:\n`дд.ММ.гггг чч:мм Текст напоминания`";
         }
     }
 }
